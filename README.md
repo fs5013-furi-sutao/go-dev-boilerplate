@@ -1,8 +1,81 @@
-# 概要
+# Go dev boilerplate
+
+VSCode + Docker + Remote Container + Air で構成するシンプルな Go 開発環境の作り方
+
+## 使用方法
+
+1. このリポジトリをクローンする
+
+``` console
+git clone https://github.com/fs5013-furi-sutao/go-dev-boilerplate.git
+```
+
+2. このローカルリポジトリを VSCode で開く
+3. コンテナを作成する
+
+``` console 
+docker-compose build
+```
+
+4. コンテナを起動する
+
+``` console
+docker-compose up -d
+```
+
+5. VSCode で開発コンテナに接続する
+
+VSCode の左下にある `><` マークを押す > [reopen in container] を選択
+
+## その他操作
+
+### コンテナのログを表示
+
+``` console
+docker-compose logs -f web
+```
+
+### 起動コンテナのプロセスを確認
+
+``` console
+docker ps
+```
+
+### コンテナを停止
+
+``` console
+docker-compose stop
+```
+
+### 過去に起動コンテナの全プロセスを確認
+
+``` console
+docker ps -a
+```
+
+### コンテナを削除
+
+``` console
+docker-compose 
+```
+
+### コンテナの全イメージを表示
+
+``` console 
+docker images
+```
+
+### コンテナイメージを削除
+
+``` console
+docker rmi go-dev-boilerplate_web
+```
+
+## Go 開発環境構築方法の説明
 
 Docker, VSCode Remote Container, Air による Go 開発環境構築
 
-# やりたいこと
+### やりたいこと
 
 Docker と VSCode Remote Container による Go の Web サーバ開発環境を構築する
 
@@ -13,9 +86,9 @@ Docker と VSCode Remote Container による Go の Web サーバ開発環境を
 
 の Go 開発環境を構築
 
-## 開発環境の構築
+### 開発環境の構築
 
-### ディレクトリ構造
+#### ディレクトリ構造
 
 ```
 .
@@ -27,7 +100,7 @@ Docker と VSCode Remote Container による Go の Web サーバ開発環境を
 └── Dockerfile
 ```
 
-### コンテナ設定
+#### コンテナ設定
 
 ここでは Go 拡張機能で使用する language server に必要な gopls や、
 ライブリロードに必要な Air のバイナリインストール＆ビルドを行っている。
@@ -70,7 +143,7 @@ services:
       - SYS_PTRACE
 ```
 
-### ライブリロード設定
+#### ライブリロード設定
 
 `.air.toml` でライブリロードの設定を行う。
 今回は、公式のサンプルコードをそのまま使う。
@@ -78,7 +151,7 @@ services:
 air/air_example.toml  
 https://github.com/cosmtrek/air/blob/master/air_example.toml
 
-### コンテナ接続設定
+#### コンテナ接続設定
 
 VSCode Remote Container 用の設定をする。
 
@@ -134,15 +207,15 @@ extensions の部分で、ワークスペースに任意の VSCode 拡張をイ�
 
 alpine でも bash を使いたい場合は、イメージビルド時に bash を入れたりするなど、適宜カスタマイズする。
 
-## 開発環境の起動
+### 開発環境の起動
 
-### Docker イメージのビルド
+#### Docker イメージのビルド
 
 ``` console
 docker-compoase build
 ```
 
-### コンテナの立ち上げ
+#### コンテナの立ち上げ
 
 ``` console
 docker-compose up -d
@@ -162,7 +235,7 @@ web_1  | /_/--\ |_| |_| \_  // live reload for Go apps, with Go
 web_1  |
 ```
 
-### 開発コンテナ接続
+#### 開発コンテナ接続
 
 Remote Container でコンテナに接続する方法はいくつかあります。以下のうちどれかを行う。（どれでもいい）
 
@@ -172,7 +245,7 @@ Remote Container でコンテナに接続する方法はいくつかあります
 - VSCode の左下にある >< を押す > [reopen in container] を選択
 - 左側のアイコン(Remote Explerer) > Containers > 該当のコンテナを選択
 
-### コーディングしてみる
+#### コーディングしてみる
 
 Go コンテナの中に入ることができたので、とりあえず Gin で Web サーバーを立てて動作を確認する。
 
@@ -188,7 +261,7 @@ go get -u github.com/gin-gonic/gin
 
 で gin をインストール。
 
-### サーバー立ち上げ
+#### サーバー立ち上げ
 
 ``` console
 touch ./main.go
@@ -211,7 +284,7 @@ func main() {
 }
 ```
 
-### 動作確認
+#### 動作確認
 
 http://localhost:8080/ping
 
@@ -221,15 +294,19 @@ http://localhost:8080/ping
 
 動いていることを確認できた。
 
-### ライブリロードの確認
+#### ライブリロードの確認
 
 `main.go` の以下のように変えてみる。
 
-```
-"message": "fuga",
+``` go
+	r.GET("hoge", func(c *gin.Context) { // change: ping -> hoge
+		c.JSON(200, gin.H{
+			"message": "fuga", // change: pong -> fuga
+		})
+	})
 ```
 
-### 再度動作確認
+#### 再度動作確認
 
 ``` console
 web_1  | main.go has changed
@@ -239,10 +316,10 @@ web_1  | [GIN-debug] GET    /ping                     --> main.main.func1 (3 han
 web_1  | [GIN-debug] GET    /hoge                     --> main.main.func2 (3 handlers)
 ```
 
-http://localhost:8080/ping
+http://localhost:8080/hoge
 
 ```
-{ "message": "pong" }
+{ "message": "fuga" }
 ```
 
 変更が反映されていることがわかる。
@@ -269,4 +346,3 @@ http://localhost:8080/ping
 2. ここで、VSCode でデバッグを行うと、デバッグのためにソースコードがビルドされる。
 
 3. デバッグでのビルド時、同じくポート:8080で Gin をサーバを立ち上げようとするため、ポートの競合が発生し、デバッグモードにできない。
-4. 
