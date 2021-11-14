@@ -27,6 +27,10 @@ docker-compose up -d
 
 VSCode の左下にある `><` マークを押す > [reopen in container] を選択
 
+```
+事前に VSCode に拡張機能の Remote Container をインストールしておくこと
+```
+
 ## その他操作
 
 ### コンテナのログを表示
@@ -158,8 +162,6 @@ VSCode Remote Container 用の設定をする。
 extensions の部分で、ワークスペースに任意の VSCode 拡張をインストールすることができる。
 今回は、最低限の設定として Go の VSCode 拡張を入れている。
 
-
-
 `/.devcontainer/.devcontainer.json`
 ``` json
 {
@@ -244,6 +246,10 @@ Remote Container でコンテナに接続する方法はいくつかあります
 - [Cmd + Shift + P] > [reopen in container]を選択
 - VSCode の左下にある >< を押す > [reopen in container] を選択
 - 左側のアイコン(Remote Explerer) > Containers > 該当のコンテナを選択
+
+```
+事前に VSCode に拡張機能の Remote Container をインストールしておくこと
+```
 
 #### コーディングしてみる
 
